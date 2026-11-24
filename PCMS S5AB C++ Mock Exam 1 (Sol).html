@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>(2026-27) S5AB C++ 模擬考試 1 完整投影片詳解</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', '"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', '"Fira Code"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Google Fonts: Noto Sans TC, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- KaTeX for crisp math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg-deck: #f1f5f9;
+      --bg-slide: #ffffff;
+      --bg-subtle: #f8fafc;
+      --border-soft: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent-blue: #2563eb;
+      --accent-indigo: #4f46e5;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-deck);
+      color: var(--text-main);
+      font-family: 'Noto Sans TC', 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* 16:9 Slide Container */
+    .slide-viewport-wrapper {
+      min-height: calc(100vh - 116px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 20px;
+    }
+
+    .slide-16-9 {
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      background-color: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.12), 0 4px 12px -4px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Compact internal typography & spacing so 16:9 slides stay rich without overflow or huge empty gaps */
+    .slide-header {
+      padding: 14px 28px 10px 28px;
+      background: linear-gradient(90deg, #ffffff 0%, #f8fafc 100%);
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .slide-body {
+      flex: 1;
+      padding: 14px 28px;
+      display: grid;
+      gap: 16px;
+      overflow-y: auto;
+      align-content: stretch;
+    }
+
+    .slide-footer {
+      padding: 8px 28px;
+      background-color: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #64748b;
+      flex-shrink: 0;
+    }
+
+    /* Code blocks */
+    pre.cpp-box {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #2563eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: #0f172a;
+      overflow-x: auto;
+      margin: 0;
+      white-space: pre;
+    }
+
+    .kw { color: #1d4ed8; font-weight: 600; }
+    .tp { color: #0f766e; font-weight: 600; }
+    .num { color: #b45309; font-weight: 600; }
+    .cm { color: #64748b; font-style: italic; }
+    .blank-tag {
+      display: inline-block;
+      background-color: #fef3c7;
+      color: #92400e;
+      border: 1px solid #f59e0b;
+      border-radius: 5px;
+      padding: 0 5px;
+      font-weight: 700;
+    }
+
+    .ans-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+      border-radius: 9999px;
+      padding: 1px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .card-panel {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 11px 14px;
+    }
+
+    .card-subtle {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 13px;
+    }
+
+    /* KaTeX font sizing inside slides */
+    .katex {
+      font-size: 0.98em;
+    }
+
+    /* Print / Export PDF Mode: render all 16:9 slides cleanly */
+    @media print {
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+
+      body {
+        background-color: #ffffff !important;
+        overflow: visible !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      #all-slides-print {
+        display: block !important;
+      }
+
+      .print-slide-page {
+        width: 100vw;
+        height: 100vh;
+        page-break-after: always;
+        break-after: page;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+      }
+
+      .print-slide-page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+
+      .slide-16-9 {
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        aspect-ratio: auto;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    #all-slides-print {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Control Bar -->
+  <header class="no-print sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 px-4 py-2.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white font-mono font-bold text-sm">C++</span>
+        <div>
+          <div class="text-sm font-bold text-slate-900 leading-tight">(2026-27) S5AB C++ 模擬考試 1 — 完整投影片詳解</div>
+          <div class="text-xs text-slate-500">16:9 白底教學版 · 共 32 題 + 考點總結</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-prev" onclick="prevSlide()" class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer">
+          ← 上一頁
+        </button>
+        <span id="slide-counter" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 font-mono text-xs font-bold">
+          1 / 16
+        </span>
+        <button id="btn-next" onclick="nextSlide()" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition cursor-pointer">
+          下一頁 →
+        </button>
+        <button id="btn-nav" onclick="toggleNavigator()" class="px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-semibold transition cursor-pointer">
+          目錄跳轉
+        </button>
+        <button onclick="window.print()" class="px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition cursor-pointer">
+          列印 / 匯出 PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="max-w-7xl mx-auto mt-2">
+      <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div id="progress-bar" class="h-full bg-blue-600 transition-all duration-300" style="width: 6.25%;"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide Navigator Drawer -->
+  <div id="nav-drawer" class="no-print hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs flex justify-end" onclick="closeNavigatorOnBackdrop(event)">
+    <div class="w-full max-w-md bg-white h-full shadow-2xl border-l border-slate-200 p-5 flex flex-col justify-between overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">投影片目錄（共 16 頁）</h2>
+            <p class="text-xs text-slate-500">點擊任一頁即可快速跳轉，或按數字鍵 / 左右方向鍵</p>
+          </div>
+          <button onclick="toggleNavigator()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">
+            關閉 ✕
+          </button>
+        </div>
+        <div id="nav-list" class="mt-3 space-y-1.5"></div>
+      </div>
+      <div class="pt-3 border-t border-slate-200 text-xs text-slate-500">
+        快捷鍵：<span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">←</span> <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">→</span> <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">Space</span> 翻頁
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Single-Slide Interactive Stage -->
+  <main class="no-print slide-viewport-wrapper">
+    <div id="active-slide-stage" class="slide-16-9"></div>
+  </main>
+
+  <!-- Bottom Quick Strip -->
+  <footer class="no-print bg-white border-t border-slate-200 px-4 py-2">
+    <div id="bottom-pill-strip" class="max-w-7xl mx-auto flex items-center justify-center gap-1.5 overflow-x-auto"></div>
+  </footer>
+
+  <!-- Full Deck Container for Print / PDF Export -->
+  <div id="all-slides-print"></div>
+
+  <script>
+    /**
+     * Slide Deck Data Definition
+     * Every slide uses a crisp white/subtle-slate 16:9 two-column or structured layout
+     * covering all 32 problems + final core knowledge summary without average score.
+     */
+    const SLIDES = [
+      // SLIDE 1: COVER
+      {
+        id: 1,
+        section: "總覽封面",
+        title: "(2026-27) S5AB C++ 模擬考試 1",
+        subtitle: "完整 32 題逐題詳解、演算法推導與視覺化圖表",
+        render: () => `
+          <div class="slide-header">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">S5AB C++ MOCK EXAM 1</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">難度：★★★☆☆ · 滿分 120</span>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 01 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12 items-center">
+            <!-- Left Column: Hero & Exam Info -->
+            <div class="col-span-7 space-y-3 pr-2">
+              <div class="inline-block px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">
+                演算法與程式設計基礎複習
+              </div>
+              <h1 class="text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
+                (2026-27) S5AB C++<br/>模擬考試 1 完整解答
+              </h1>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                本投影片針對考卷三大部分共 <strong class="text-slate-900">32 題</strong> 提供逐步拆解：包含基礎語法與位元運算、閱讀程序時間複雜度與滑動窗口分析，以及完善程序的二分答案與質因數分解。
+              </p>
+
+              <div class="grid grid-cols-3 gap-2.5 pt-1">
+                <div class="card-subtle">
+                  <div class="text-xs text-slate-500 font-semibold">一、單選/填空</div>
+                  <div class="text-base font-extrabold text-slate-900 mt-0.5">第 1–10 題</div>
+                  <div class="text-[11px] text-slate-600">40 分 · 語法/位元/數論</div>
+                </div>
+                <div class="card-subtle">
+                  <div class="text-xs text-slate-500 font-semibold">二、閱讀程序</div>
+                  <div class="text-base font-extrabold text-slate-900 mt-0.5">第 11–22 題</div>
+                  <div class="text-[11px] text-slate-600">40 分 · 枚舉/滑動窗口</div>
+                </div>
+                <div class="card-subtle">
+                  <div class="text-xs text-slate-500 font-semibold">三、完善程序</div>
+                  <div class="text-base font-extrabold text-slate-900 mt-0.5">第 23–32 題</div>
+                  <div class="text-[11px] text-slate-600">40 分 · 二分/質因數分解</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Core Topics & Reference Link -->
+            <div class="col-span-5 space-y-2.5">
+              <div class="card-panel space-y-2">
+                <div class="text-xs font-bold uppercase tracking-wider text-blue-700">核心考點地圖</div>
+                <div class="flex flex-wrap gap-1.5 text-xs">
+                  <span class="px-2.5 py-1 rounded-md bg-blue-50 text-blue-800 font-semibold">枚舉算法</span>
+                  <span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-800 font-semibold">模擬與邊界</span>
+                  <span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 font-semibold">二分答案</span>
+                  <span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 font-semibold">位元與邏輯運算</span>
+                  <span class="px-2.5 py-1 rounded-md bg-cyan-50 text-cyan-800 font-semibold">前綴和 / 滑動窗口</span>
+                  <span class="px-2.5 py-1 rounded-md bg-purple-50 text-purple-800 font-semibold">素數與質因數分解</span>
+                </div>
+              </div>
+
+              <div class="card-subtle space-y-1.5">
+                <div class="text-xs font-bold text-slate-800">原始試題連結</div>
+                <a href="https://tler123.github.io/oi_papers/PCMS%20S5AB%20C++%20Mock%20Exam%201.pdf" target="_blank" rel="noopener noreferrer" class="block text-xs font-mono text-blue-600 hover:underline break-all">
+                  PCMS S5AB C++ Mock Exam 1.pdf
+                </a>
+                <p class="text-[11px] text-slate-500 leading-snug">
+                  建議搭配螢幕按鈕或鍵盤 <span class="font-mono font-semibold">← / →</span> 瀏覽；按「列印 / 匯出 PDF」可輸出完整 16:9 講義。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>(2026-27) S5AB C++ Mock Exam 1 Solution Deck</span>
+            <span>按 → 或點擊「下一頁」開始逐題解析</span>
+          </div>
+        `
+      },
+
+      // SLIDE 2: Q1 - Q3
+      {
+        id: 2,
+        section: "一、單選/填空題 (1–3)",
+        title: "第 1–3 題：GESP 賽制、100 以內最大素數與前綴和",
+        subtitle: "基礎競賽常識、質數定義與前綴和序列建構",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">一、單選/填空題 · 第 1 至 3 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">競賽賽制、素數判定與前綴和序列</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 02 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Q1 & Q2 -->
+            <div class="col-span-6 space-y-2.5">
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 1 題：GESP 機試賽制</span>
+                  <span class="ans-pill">答案：B</span>
+                </div>
+                <p class="text-xs text-slate-600">國內 CCF 主辦的 GESP 考級機試部分採用哪種賽制？(A) IOI (B) OI (C) MOI (D) ACM/ICPC</p>
+                <p class="text-xs text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                  <strong>解析：</strong>OI 賽制（Olympiad in Informatics）為國內資訊學競賽與 GESP 機試常見賽制，提交後通常在賽後統一評測並按測試點給分，故選 <strong>B</strong>。
+                </p>
+              </div>
+
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 2 題：100 以內最大的素數</span>
+                  <span class="ans-pill">答案：C</span>
+                </div>
+                <p class="text-xs text-slate-600">素數是大於 $1$ 且僅能被 $1$ 和自身整除的整數。$100$ 以內最大素數為？(A) $29$ (B) $77$ (C) $97$ (D) $99$</p>
+                <div class="text-xs text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200 space-y-1">
+                  <div><strong>解析：</strong>從大往小檢驗合數：</div>
+                  <div class="font-mono text-[11px]">100 = 2²×5² · 99 = 3²×11 · 98 = 2×7²</div>
+                  <div>$97$ 無法被 $\le \lfloor\sqrt{97}\rfloor = 9$ 的質數整除，因此 $97$ 是素數，選 <strong>C</strong>。</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Q3 Prefix Sum -->
+            <div class="col-span-6 space-y-2.5">
+              <div class="card-panel h-full flex flex-col justify-between space-y-2">
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-800">第 3 題：前綴和序列 (Prefix Sum)</span>
+                    <span class="ans-pill">答案：A</span>
+                  </div>
+                  <p class="text-xs text-slate-600">
+                    序列 $[5, 3, -1, 2, 8]$ 的前綴和序列（第 $k$ 項為原序列前 $k$ 項之和 $S_k = \sum_{i=1}^{k} a_i$）為？
+                  </p>
+                  <p class="text-xs text-slate-500">(A) $[5,8,7,9,17]$ · (B) $[5,8,6,8,16]$ · (C) $[17,12,9,10,8]$ · (D) $[5,8,9,11,19]$</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full text-xs border-collapse border border-slate-200 font-mono">
+                    <thead>
+                      <tr class="bg-slate-100 text-slate-700">
+                        <th class="border border-slate-200 px-2 py-1 text-left">位置 $i$</th>
+                        <th class="border border-slate-200 px-2 py-1 text-center">1</th>
+                        <th class="border border-slate-200 px-2 py-1 text-center">2</th>
+                        <th class="border border-slate-200 px-2 py-1 text-center">3</th>
+                        <th class="border border-slate-200 px-2 py-1 text-center">4</th>
+                        <th class="border border-slate-200 px-2 py-1 text-center">5</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="border border-slate-200 px-2 py-1 font-semibold bg-slate-50">原數組 $a_i$</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">5</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">3</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">-1</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">2</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">8</td>
+                      </tr>
+                      <tr>
+                        <td class="border border-slate-200 px-2 py-1 font-semibold bg-slate-50">累加算式</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">5</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">5+3</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">8-1</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">7+2</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">9+8</td>
+                      </tr>
+                      <tr class="bg-emerald-50/70 font-bold text-emerald-900">
+                        <td class="border border-slate-200 px-2 py-1">前綴和 $S_i$</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">5</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">8</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">7</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">9</td>
+                        <td class="border border-slate-200 px-2 py-1 text-center">17</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="text-xs text-slate-700 bg-blue-50/60 border border-blue-100 rounded-lg px-2.5 py-1.5">
+                  <strong>重點：</strong>遞推式為 $S_1 = a_1$，$S_i = S_{i-1} + a_i$。第 3 項加 $-1$ 後由 $8$ 降為 $7$，故選 <strong>A</strong>。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第一部分：單選/填空題 (第 1–3 題)</span>
+            <span>第 2 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 3: Q4 - Q6
+      {
+        id: 3,
+        section: "一、單選/填空題 (4–6)",
+        title: "第 4–6 題：vector 遍歷、ASCII 判斷與合法標識符",
+        subtitle: "陣列下標邊界、字元區間條件與 C++ 關鍵字辨識",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">一、單選/填空題 · 第 4 至 6 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">容器索引、字元判斷與標識符規範</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 03 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Q4 & Q5 -->
+            <div class="col-span-6 space-y-2.5">
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 4 題：輸出 vector 元素</span>
+                  <span class="ans-pill">答案：A</span>
+                </div>
+                <p class="text-xs text-slate-600">已知 <code class="font-mono bg-slate-100 px-1 rounded">vector&lt;int&gt; a = {1,2,3,4,5};</code>，哪項一定輸出 <code class="font-mono">1 2 3 4 5</code>？</p>
+                <ul class="text-xs text-slate-700 space-y-1 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                  <li><strong class="text-emerald-700">A（正確）：</strong><code class="font-mono">i</code> 從 <code class="font-mono">0</code> 到 <code class="font-mono">4</code>，剛好訪問 <code class="font-mono">a[0..4]</code>。</li>
+                  <li><strong>B（錯誤）：</strong><code class="font-mono">i &lt;= a.size()</code> 會訪問 <code class="font-mono">a[5]</code>，導致越界（UB）。</li>
+                  <li><strong>C / D（錯誤）：</strong>C 未初始化 <code class="font-mono">i</code>；D 在 <code class="font-mono">while</code> 條件內宣告變數不合語法。</li>
+                </ul>
+              </div>
+
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 5 題：判斷大寫英文字母</span>
+                  <span class="ans-pill">答案：D</span>
+                </div>
+                <p class="text-xs text-slate-600">判斷字元 <code class="font-mono bg-slate-100 px-1 rounded">c</code> 是否為大寫字母並回傳 <code class="font-mono bg-slate-100 px-1 rounded">true</code>：</p>
+                <div class="text-xs text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200 space-y-1">
+                  <div>大寫字母 <code class="font-mono">'A'</code>（ASCII <span class="font-mono">65</span>）至 <code class="font-mono">'Z'</code>（ASCII <span class="font-mono">90</span>）為連續區間，需同時滿足 <code class="font-mono">c &gt;= 'A'</code> <strong>且</strong> <code class="font-mono">c &lt;= 'Z'</code>。</div>
+                  <div>A 邏輯與語意皆錯；B 區間反向；C 漏掉端點 <code class="font-mono">'A'</code> 與 <code class="font-mono">'Z'</code>。故選 <strong>D</strong>。</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Q6 Identifiers -->
+            <div class="col-span-6">
+              <div class="card-panel h-full flex flex-col justify-between space-y-2">
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-800">第 6 題：C++ 合法標識符辨析</span>
+                    <span class="ans-pill">答案：C</span>
+                  </div>
+                  <p class="text-xs text-slate-600">
+                    標識符只能由字母、數字、底線 <code class="font-mono">_</code> 組成，不能以數字開頭，且<strong>不能是 C++ 關鍵字</strong>。
+                  </p>
+                </div>
+
+                <div class="space-y-1.5 text-xs">
+                  <div class="p-2 rounded-lg bg-red-50/70 border border-red-200">
+                    <span class="font-bold text-red-800">A 錯誤：</span><code class="font-mono">const</code> 是限定詞關鍵字，不可作標識符。
+                  </div>
+                  <div class="p-2 rounded-lg bg-red-50/70 border border-red-200">
+                    <span class="font-bold text-red-800">B 錯誤：</span><code class="font-mono">a|b</code> 含運算子 <code class="font-mono">|</code>、<code class="font-mono">**x</code> 含 <code class="font-mono">*</code>、<code class="font-mono">0x32</code> 以數字開頭、<code class="font-mono">double</code> 為關鍵字。
+                  </div>
+                  <div class="p-2 rounded-lg bg-emerald-50/80 border border-emerald-200">
+                    <span class="font-bold text-emerald-800">C 正確：</span><code class="font-mono">_car1</code>、<code class="font-mono">Int</code>（首字大寫 <code class="font-mono">I</code> 非關鍵字 <code class="font-mono">int</code>）、<code class="font-mono">j</code>、<code class="font-mono">init</code> 全部合法。
+                  </div>
+                  <div class="p-2 rounded-lg bg-red-50/70 border border-red-200">
+                    <span class="font-bold text-red-800">D 錯誤：</span><code class="font-mono">static</code>、<code class="font-mono">char</code>、<code class="font-mono">float</code> 皆為保留關鍵字。
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第一部分：單選/填空題 (第 4–6 題)</span>
+            <span>第 3 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 4: Q7 - Q8
+      {
+        id: 4,
+        section: "一、單選/填空題 (7–8)",
+        title: "第 7–8 題：枚舉算法與二分查找 / 二分答案性質",
+        subtitle: "剪枝與時間複雜度、單調性條件與查找失敗邊界",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">一、單選/填空題 · 第 7 至 8 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">枚舉算法特性與二分法關鍵規則</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 04 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Q7 Enumeration -->
+            <div class="col-span-6">
+              <div class="card-panel h-full space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 7 題：枚舉算法正確性</span>
+                  <span class="ans-pill">答案：B</span>
+                </div>
+                <p class="text-xs text-slate-600">下列哪項有關枚舉算法的說法正確？</p>
+                <div class="space-y-1.5 text-xs text-slate-700">
+                  <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                    <strong>A 錯：</strong>可配合<strong>剪枝（Pruning）</strong>提前排除不可能分支，不必盲目走完所有無效狀態。
+                  </div>
+                  <div class="p-2 rounded-lg bg-emerald-50/80 border border-emerald-200">
+                    <strong>B 對：</strong>枚舉核心是遍歷候選解空間，候選集規模越大，耗時通常與解空間大小呈正相關。
+                  </div>
+                  <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                    <strong>C 錯：</strong>枚舉廣泛用於排列、組合、子集與搜尋問題，不只限數值計算。
+                  </div>
+                  <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                    <strong>D 錯：</strong>適當剪枝是提升枚舉效率的常用手段。
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Q8 Binary Search -->
+            <div class="col-span-6">
+              <div class="card-panel h-full space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 8 題：二分法核心觀念</span>
+                  <span class="ans-pill">答案：D</span>
+                </div>
+                <p class="text-xs text-slate-600">下列哪項有關二分的說法正確？</p>
+                <div class="space-y-1.5 text-xs text-slate-700">
+                  <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                    <strong>A 錯：</strong>二分答案只需滿足<strong>單調性</strong>（單調不減或單調不增），不要求嚴格單調。
+                  </div>
+                  <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                    <strong>B 錯：</strong>二分將線性 $\Theta(n)$ 降至對數 $\Theta(\log n)$，時間複雜度<strong>低於</strong>線性枚舉。
+                  </div>
+                  <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                    <strong>C 錯：</strong>實數二分可透過固定迭代次數（如 100 次）或精度 $\varepsilon$ 控制誤差。
+                  </div>
+                  <div class="p-2 rounded-lg bg-emerald-50/80 border border-emerald-200">
+                    <strong>D 對：</strong>在閉區間 <code class="font-mono">[l, r]</code> 標準二分中，若未找到目標，迴圈終止時必有 <code class="font-mono">l &gt; r</code>。
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第一部分：單選/填空題 (第 7–8 題)</span>
+            <span>第 4 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 5: Q9 Bitwise & Logic Expression
+      {
+        id: 5,
+        section: "一、單選/填空題 (9)",
+        title: "第 9 題詳解：C++ 運算子優先級與位元運算",
+        subtitle: "4 + ((~3 & 7) + (4 && (6 % 3 - 2)) ^ (!0 << 1) - 5/4 + (5 >> 1 << 2)) * 43",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">一、單選/填空題 · 第 9 題（填空題）</span>
+              <h2 class="text-lg font-extrabold text-slate-900">複雜位元與邏輯運算式逐步拆解</h2>
+            </div>
+            <span class="ans-pill">答案：520</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Step-by-step sub-expressions -->
+            <div class="col-span-7 space-y-2">
+              <div class="card-subtle font-mono text-[11.5px] text-slate-800 break-all">
+                原式：4 + ((~3 &amp; 7) + (4 &amp;&amp; (6 % 3 - 2)) ^ (!0 &lt;&lt; 1) - 5/4 + (5 &gt;&gt; 1 &lt;&lt; 2)) * 43
+              </div>
+
+              <table class="w-full text-xs border-collapse border border-slate-200">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-700">
+                    <th class="border border-slate-200 px-2 py-1 text-left">子項</th>
+                    <th class="border border-slate-200 px-2 py-1 text-left">二進位 / 運算細節</th>
+                    <th class="border border-slate-200 px-2 py-1 text-right">結果</th>
+                  </tr>
+                </thead>
+                <tbody class="font-mono text-[11px]">
+                  <tr>
+                    <td class="border border-slate-200 px-2 py-1 font-bold">~3 &amp; 7</td>
+                    <td class="border border-slate-200 px-2 py-1">~3末四位 <span class="text-blue-700">1100</span> &amp; <span class="text-blue-700">0111</span> = <span class="text-emerald-700">0100</span></td>
+                    <td class="border border-slate-200 px-2 py-1 text-right font-bold">4</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-slate-200 px-2 py-1 font-bold">4 &amp;&amp; (6%3-2)</td>
+                    <td class="border border-slate-200 px-2 py-1">6%3-2 = -2 (非0) → true &amp;&amp; true = bool(1)</td>
+                    <td class="border border-slate-200 px-2 py-1 text-right font-bold">1</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-slate-200 px-2 py-1 font-bold">!0 &lt;&lt; 1</td>
+                    <td class="border border-slate-200 px-2 py-1">!0 為 true(1)，左移 1 位 → 1 &lt;&lt; 1</td>
+                    <td class="border border-slate-200 px-2 py-1 text-right font-bold">2</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-slate-200 px-2 py-1 font-bold">5 / 4</td>
+                    <td class="border border-slate-200 px-2 py-1">整數除法向零/向下取整（正數 1.25 → 1）</td>
+                    <td class="border border-slate-200 px-2 py-1 text-right font-bold">1</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-slate-200 px-2 py-1 font-bold">5 &gt;&gt; 1 &lt;&lt; 2</td>
+                    <td class="border border-slate-200 px-2 py-1">(5&gt;&gt;1)=2，再 &lt;&lt;2 = 8</td>
+                    <td class="border border-slate-200 px-2 py-1 text-right font-bold">8</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Right: XOR & Final Arithmetic -->
+            <div class="col-span-5 space-y-2.5">
+              <div class="card-panel space-y-2">
+                <div class="text-xs font-bold text-slate-800">括號內合併與異或 (XOR)</div>
+                <div class="text-xs text-slate-700 space-y-1.5">
+                  <div>
+                    算術優先級高於位元異或 <code class="font-mono">^</code>：
+                  </div>
+                  <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 font-mono text-[11px] space-y-1">
+                    <div>左段：(4 + 1) = 5 → 0101₂</div>
+                    <div>右段：(2 - 1 + 8) = 9 → 1001₂</div>
+                    <div class="text-indigo-700 font-bold">5 ^ 9 = 1100₂ = 12</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-subtle space-y-1.5">
+                <div class="text-xs font-bold text-emerald-800">最終計算</div>
+                <div class="font-mono text-sm font-bold text-slate-900">
+                  4 + 12 × 43 = 4 + 516 = 520
+                </div>
+                <p class="text-[11px] text-slate-600">
+                  易錯點：<code class="font-mono">&amp;&amp;</code> 邏輯與不同於 <code class="font-mono">&amp;</code> 按位與；<code class="font-mono">^</code> 優先級低於 <code class="font-mono">+</code>、<code class="font-mono">-</code>。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第一部分：單選/填空題 (第 9 題)</span>
+            <span>第 5 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 6: Q10 XOR of 32439, 1048575, 2147483647
+      {
+        id: 6,
+        section: "一、單選/填空題 (10)",
+        title: "第 10 題詳解：三個大整數的二進制按位異或 (XOR)",
+        subtitle: "32439 ^ 1048575 ^ 2147483647 的位元遮罩與代數等價性",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">一、單選/填空題 · 第 10 題（填空題）</span>
+              <h2 class="text-lg font-extrabold text-slate-900">利用 $2^k - 1$ 性質快速計算連續 XOR</h2>
+            </div>
+            <span class="ans-pill">答案：2146467511</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Bit-mask visual bars -->
+            <div class="col-span-7 space-y-2.5">
+              <div class="card-panel space-y-2">
+                <div class="text-xs font-bold text-slate-800">二進位結構觀察</div>
+                <div class="space-y-2 font-mono text-[11px]">
+                  <div>
+                    <div class="flex justify-between text-slate-600 mb-0.5">
+                      <span>2147483647 = 2³¹ − 1</span>
+                      <span>31 個 1</span>
+                    </div>
+                    <div class="h-4 w-full rounded bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
+                      11111111111 (31 bits of 1)
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-slate-600 mb-0.5">
+                      <span>1048575 = 2²⁰ − 1</span>
+                      <span>低 20 位全為 1</span>
+                    </div>
+                    <div class="grid grid-cols-12 gap-0.5 h-4">
+                      <div class="col-span-4 rounded bg-slate-200 text-slate-600 text-[10px] flex items-center justify-center">0...0</div>
+                      <div class="col-span-8 rounded bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">1111111 (20 bits of 1)</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-slate-600 mb-0.5">
+                      <span>前兩者 XOR：(2³¹−1) ^ (2²⁰−1)</span>
+                      <span>高 11 位為 1，低 20 位為 0</span>
+                    </div>
+                    <div class="grid grid-cols-12 gap-0.5 h-4">
+                      <div class="col-span-4 rounded bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">1111</div>
+                      <div class="col-span-8 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] flex items-center justify-center">0000000 (20 bits of 0)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-subtle text-xs text-slate-700">
+                <strong>關鍵洞察：</strong>當低位全為 <code class="font-mono">0</code> 時，與小於 <code class="font-mono">2²⁰</code> 的 <code class="font-mono">32439</code> 做 XOR，每位「<code class="font-mono">0 ^ b</code>」都等於「<code class="font-mono">0 + b</code>」，不產生借位或進位衝突。
+              </div>
+            </div>
+
+            <!-- Right: Exact calculation -->
+            <div class="col-span-5 space-y-2.5">
+              <div class="card-panel space-y-2">
+                <div class="text-xs font-bold text-slate-800">等價算式推導</div>
+                <div class="font-mono text-xs text-slate-800 bg-slate-50 p-2.5 rounded-lg border border-slate-200 space-y-1.5">
+                  <div>(2³¹ − 1) ^ (2²⁰ − 1)</div>
+                  <div class="text-slate-500">= (2³¹ − 1) − (2²⁰ − 1)</div>
+                  <div class="text-blue-700 font-bold">= 2147483647 − 1048575</div>
+                  <div class="text-slate-700">= 2146435072</div>
+                </div>
+                <div class="font-mono text-xs text-slate-800 bg-emerald-50/80 p-2.5 rounded-lg border border-emerald-200 space-y-1">
+                  <div>再異或 32439（32439 &lt; 2²⁰）：</div>
+                  <div class="text-emerald-800 font-extrabold text-sm">2146435072 + 32439 = 2146467511</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第一部分：單選/填空題 (第 10 題)</span>
+            <span>第 6 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 7: Reading Program (1) Q11 - Q13
+      {
+        id: 7,
+        section: "二、閱讀程序 (1) (11–13)",
+        title: "第 11–13 題：三元組求和計數與 $O(n^2)$ 優化",
+        subtitle: "統計滿足 i + j + k = n（1 ≤ i, j, k ≤ n）的正整數解個數",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">二、閱讀程序 (1) · 第 11 至 13 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">方程 $a+b+c=n$ 解數推導與時間複雜度優化</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 07 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Code & Math Derivation -->
+            <div class="col-span-6 space-y-2">
+              <pre class="cpp-box"><span class="kw">int</span> n, cnt = <span class="num">0</span>;
+cin &gt;&gt; n;
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= n; i++)
+  <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">1</span>; j &lt;= n; j++)
+    <span class="kw">for</span> (<span class="kw">int</span> k = <span class="num">1</span>; k &lt;= n; k++)
+      <span class="kw">if</span> (i + j + k == n) cnt++;
+cout &lt;&lt; cnt;</pre>
+
+              <div class="card-subtle text-xs text-slate-700 space-y-1">
+                <div><strong>組合數推導：</strong>固定 $i \in [1, n-2]$，則 $j + k = n - i$。</div>
+                <div>$j \in [1, n-i-1]$ 時，$k = n - i - j \in [1, n-i-1]$ 皆合法，共 $n - i - 1$ 組。</div>
+                <div class="font-mono text-[11px] text-blue-800 font-semibold">
+                  cnt = Σ_{i=1}^{n-2} (n - 1 - i) = 1 + 2 + ... + (n - 2) = (n - 1)(n - 2) / 2
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Q11 - Q13 -->
+            <div class="col-span-6 space-y-2">
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 11 題：輸入 10，輸出為 8</span>
+                  <span class="ans-pill">答案：F</span>
+                </div>
+                <p class="text-xs text-slate-600">代入 $n = 10$：$(10 - 1)(10 - 2) / 2 = 9 \times 8 / 2 = 36 \neq 8$，故為 <strong>F</strong>。</p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 12 題：計算 $a+b+c=n$ 正整數解數量</span>
+                  <span class="ans-pill">答案：T</span>
+                </div>
+                <p class="text-xs text-slate-600">迴圈枚舉 $1 \le i,j,k \le n$ 且累加 $i+j+k=n$ 的次數，恰為正整數解個數，故為 <strong>T</strong>。</p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 13 題：$n$ 較大時可優化至約 $1/n$ 倍時間</span>
+                  <span class="ans-pill">答案：T</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  枚舉 $i, j$ 後令 $k = n - i - j$，判斷 $1 \le k \le n$ 即可，複雜度由 $\Theta(n^3)$ 降至 $\Theta(n^2)$，比值為 $\frac{1}{n}$，故為 <strong>T</strong>。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第二部分：閱讀程序 (1) (第 11–13 題)</span>
+            <span>第 7 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 8: Reading Program (1) Q14 - Q15
+      {
+        id: 8,
+        section: "二、閱讀程序 (1) (14–15)",
+        title: "第 14–15 題：公式求值與二次方程反推",
+        subtitle: "運用 cnt = (n - 1)(n - 2) / 2 進行正向計算與逆向求解",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">二、閱讀程序 (1) · 第 14 至 15 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">代入計算與由輸出反推輸入參數</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 08 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Q14 -->
+            <div class="col-span-6">
+              <div class="card-panel h-full flex flex-col justify-between space-y-2">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-800">第 14 題：輸入 67 時的輸出</span>
+                    <span class="ans-pill">答案：B</span>
+                  </div>
+                  <p class="text-xs text-slate-600">
+                    當輸入 $n = 67$ 時，程式輸出為？<br/>
+                    (A) 2140 · (B) 2145 · (C) 2150 · (D) 2155
+                  </p>
+                </div>
+
+                <div class="card-subtle font-mono text-xs text-slate-800 space-y-1.5">
+                  <div>cnt = (67 − 1) × (67 − 2) / 2</div>
+                  <div>= 66 × 65 / 2</div>
+                  <div>= 33 × 65</div>
+                  <div class="text-emerald-700 font-bold text-sm">= 2145</div>
+                </div>
+
+                <div class="text-xs text-slate-600">
+                  計算技巧：$33 \times 65 = (30 + 3) \times 65 = 1950 + 195 = 2145$，選 <strong>B</strong>。
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Q15 -->
+            <div class="col-span-6">
+              <div class="card-panel h-full flex flex-col justify-between space-y-2">
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-800">第 15 題：由輸出 21 與 120 求 2a + b</span>
+                    <span class="ans-pill">答案：C</span>
+                  </div>
+                  <p class="text-xs text-slate-600">
+                    輸入 $a$ 與 $b$ 分別輸出 <code class="font-mono">21</code> 和 <code class="font-mono">120</code>，求 $2a + b$？<br/>
+                    (A) 31 · (B) 32 · (C) 33 · (D) 34
+                  </p>
+                </div>
+
+                <div class="card-subtle text-xs text-slate-800 space-y-2">
+                  <div class="font-mono">
+                    (1) (a − 1)(a − 2) / 2 = 21 ⇒ (a − 1)(a − 2) = 42 = 7 × 6<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;因 a − 1 &gt; a − 2，得 a − 1 = 7 ⇒ <strong>a = 8</strong>
+                  </div>
+                  <div class="font-mono">
+                    (2) (b − 1)(b − 2) / 2 = 120 ⇒ (b − 1)(b − 2) = 240 = 16 × 15<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;因 b − 1 &gt; b − 2，得 b − 1 = 16 ⇒ <strong>b = 17</strong>
+                  </div>
+                </div>
+
+                <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200 font-mono text-xs text-emerald-900 font-bold">
+                  2a + b = 2 × 8 + 17 = 16 + 17 = 33 （選 C）
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第二部分：閱讀程序 (1) (第 14–15 題)</span>
+            <span>第 8 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 9: Reading Program (2) Code & Q16 - Q18
+      {
+        id: 9,
+        section: "二、閱讀程序 (2) (16–18)",
+        title: "第 16–18 題：Solve1 與 Solve2 邊界與負數陷阱",
+        subtitle: "長度 m 滑動窗口最大和與累加次數 cnt 的行為分析",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">二、閱讀程序 (2) · 第 16 至 18 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">迴圈邊界、負數初始值陷阱與累加次數下界</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 09 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Solve1 & Solve2 code -->
+            <div class="col-span-6 space-y-2">
+              <pre class="cpp-box"><span class="tp">void</span> Solve1(<span class="kw">int</span> n, <span class="kw">int</span> m, vector&lt;<span class="kw">int</span>&gt; a) {
+  <span class="kw">int</span> cur, ans = <span class="num">0</span>, cnt = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt;= n - m; i++) { <span class="cm">// 第 07 行</span>
+    cur = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">1</span>; j &lt;= m; j++) cur += a[i + j], cnt++;
+    ans = max(ans, cur);
+  }
+  cout &lt;&lt; ans &lt;&lt; <span class="num">' '</span> &lt;&lt; cnt &lt;&lt; endl;
+}
+<span class="tp">void</span> Solve2(<span class="kw">int</span> n, <span class="kw">int</span> m, vector&lt;<span class="kw">int</span>&gt; a) {
+  <span class="kw">int</span> cur = <span class="num">0</span>, cnt = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= m; i++) cur += a[i], cnt++;
+  <span class="kw">int</span> ans = cur;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= n - m; i++) {
+    cur += a[i + m] - a[i], cnt++;
+    ans = max(ans, cur);
+  }
+  cout &lt;&lt; ans &lt;&lt; <span class="num">' '</span> &lt;&lt; cnt &lt;&lt; endl;
+}</pre>
+            </div>
+
+            <!-- Right: Q16 - Q18 -->
+            <div class="col-span-6 space-y-2">
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 16 題：第 07 行 &lt;= 改 &lt; 會導致 RE</span>
+                  <span class="ans-pill">答案：F</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  <code class="font-mono">i &lt; n - m</code> 僅少跑 <code class="font-mono">i = n - m</code> 最後一個窗口，索引最大仍為 <code class="font-mono">n</code>，不會越界 RE，只會漏算最後一窗，故為 <strong>F</strong>。
+                </p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 17 題：兩行輸出的第一個數必然相等</span>
+                  <span class="ans-pill">答案：F</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  <code class="font-mono">Solve1</code> 將 <code class="font-mono">ans</code> 設為 <code class="font-mono">0</code>；若所有窗口和皆為負數，<code class="font-mono">Solve1</code> 輸出 <code class="font-mono">0</code>，而 <code class="font-mono">Solve2</code> 輸出最大負和，兩者不同，故為 <strong>F</strong>。
+                </p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 18 題：兩行輸出的第二個數都不小於 n</span>
+                  <span class="ans-pill">答案：T</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  <code class="font-mono">Solve2</code> 累加次數恆為 $m + (n - m) = n$；<code class="font-mono">Solve1</code> 累加次數為 $m(n - m + 1) \ge n$（因 $1 \le m \le n$），故兩者皆 $\ge n$，為 <strong>T</strong>。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第二部分：閱讀程序 (2) (第 16–18 題)</span>
+            <span>第 9 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 10: Reading Program (2) Q19 - Q20 Sliding Window Trace
+      {
+        id: 10,
+        section: "二、閱讀程序 (2) (19–20)",
+        title: "第 19–20 題：算法歸屬與 n=20, m=8 滑動窗口推演",
+        subtitle: "逐窗更新 cur += a[i + m] - a[i] 找出長度 8 的最大子段和",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">二、閱讀程序 (2) · 第 19 至 20 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">枚舉本質與滑動窗口逐步計算最大值</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 10 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Q19 & Array -->
+            <div class="col-span-5 space-y-2.5">
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 19 題：使用算法</span>
+                  <span class="ans-pill">答案：A</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  兩函數皆枚舉所有長度為 $m$ 的窗口區間求最大值，核心思想為 <strong>A. 枚舉</strong>（滑動窗口是枚舉窗口和的優化技巧）。
+                </p>
+              </div>
+
+              <div class="card-subtle space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 20 題：最大窗口和</span>
+                  <span class="ans-pill">答案：C (41)</span>
+                </div>
+                <div class="font-mono text-[11px] text-slate-700 bg-white p-2 rounded border border-slate-200 break-all">
+                  n=20, m=8<br/>
+                  a[1..20] = [3,9,1,1,4,8,2,7, 6,3,5,3,2,9,6,0,2,9,9,3]
+                </div>
+                <p class="text-xs text-slate-600">
+                  共 $20 - 8 + 1 = 13$ 個窗口，最大值出現在第 8 個窗口：<code class="font-mono">37 + 6 - 2 = 41</code>，選 <strong>C</strong>。
+                </p>
+              </div>
+            </div>
+
+            <!-- Right: Step-by-step table for all 13 windows -->
+            <div class="col-span-7">
+              <div class="card-panel h-full">
+                <div class="text-xs font-bold text-slate-800 mb-1.5">13 個長度為 8 的滑動窗口逐步推演</div>
+                <div class="grid grid-cols-2 gap-1.5 font-mono text-[11px]">
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W1 [1..8]: 3+9+1+1+4+8+2+7 = <strong>35</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W8 [8..15]: 37 + a[16](0) − a[8](7)? Wait: W7=37, +a[15](6)−a[7](2)=<strong>41 ★</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W2 [2..9]: 35 + a[9](6) − a[1](3) = <strong>38</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W9 [9..16]: 41 + a[16](0) − a[8](7) = <strong>34</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W3 [3..10]: 38 + a[10](3) − a[2](9) = <strong>32</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W10 [10..17]: 34 + a[17](2) − a[9](6) = <strong>30</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W4 [4..11]: 32 + a[11](5) − a[3](1) = <strong>36</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W11 [11..18]: 30 + a[18](9) − a[10](3) = <strong>36</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W5 [5..12]: 36 + a[12](3) − a[4](1) = <strong>38</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W12 [12..19]: 36 + a[19](9) − a[11](5) = <strong>40</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W6 [6..13]: 38 + a[13](2) − a[5](4) = <strong>36</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W13 [13..20]: 40 + a[20](3) − a[12](3) = <strong>40</strong></div>
+                  <div class="bg-slate-50 px-2 py-1 rounded border border-slate-200">W7 [7..14]: 36 + a[14](9) − a[6](8) = <strong>37</strong></div>
+                  <div class="bg-emerald-50 px-2 py-1 rounded border border-emerald-300 text-emerald-900 font-bold">最大值 = 41 (第 8 窗口)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第二部分：閱讀程序 (2) (第 19–20 題)</span>
+            <span>第 10 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 11: Reading Program (2) Q21 - Q22 SVG & Max Value
+      {
+        id: 11,
+        section: "二、閱讀程序 (2) (21–22)",
+        title: "第 21–22 題：cnt 與 m 的函數圖像及最大值推導",
+        subtitle: "Solve1 拋物線與 Solve2 常數線交點，以及 MAX = floor((n+1)^2 / 4)",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">二、閱讀程序 (2) · 第 21 至 22 題</span>
+              <h2 class="text-lg font-extrabold text-slate-900">函數圖像特徵與二次頂點奇偶分析</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 11 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: SVG Graph for Q21 -->
+            <div class="col-span-6 card-panel flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">第 21 題：cnt(m) 圖像關係</span>
+                <span class="ans-pill">答案：C</span>
+              </div>
+
+              <svg viewBox="0 0 360 175" class="w-full h-40 bg-slate-50 rounded-lg border border-slate-200">
+                <!-- Axes -->
+                <line x1="40" y1="150" x2="335" y2="150" stroke="#64748b" stroke-width="1.5" />
+                <line x1="40" y1="150" x2="40" y2="18" stroke="#64748b" stroke-width="1.5" />
+                <text x="325" y="166" font-size="11" fill="#334155" font-family="monospace">m</text>
+                <text x="12" y="25" font-size="11" fill="#334155" font-family="monospace">cnt</text>
+
+                <!-- Solve2 constant line cnt = n -->
+                <line x1="65" y1="112" x2="305" y2="112" stroke="#059669" stroke-width="2.2" stroke-dasharray="5,3" />
+                <text x="240" y="105" font-size="10.5" fill="#047857" font-weight="bold">Solve2: cnt = n</text>
+
+                <!-- Solve1 downward parabola passing through (1, n) and (n, n) -->
+                <path d="M 65 112 Q 185 24 305 112" fill="none" stroke="#2563eb" stroke-width="2.5" />
+                <text x="145" y="42" font-size="10.5" fill="#1d4ed8" font-weight="bold">Solve1: m(n - m + 1)</text>
+
+                <!-- Intersection points -->
+                <circle cx="65" cy="112" r="4" fill="#dc2626" />
+                <text x="54" y="165" font-size="10" fill="#334155" font-family="monospace">m=1</text>
+
+                <circle cx="305" cy="112" r="4" fill="#dc2626" />
+                <text x="292" y="165" font-size="10" fill="#334155" font-family="monospace">m=n</text>
+
+                <text x="8" y="115" font-size="10" fill="#334155" font-family="monospace">n</text>
+              </svg>
+
+              <p class="text-xs text-slate-600">
+                <code class="font-mono">Solve1</code> 為開口向下拋物線 <code class="font-mono">m(n - m + 1)</code>，在 <code class="font-mono">m = 1</code> 與 <code class="font-mono">m = n</code> 處均等於 <code class="font-mono">n</code>，與常數線 <code class="font-mono">Solve2: cnt = n</code> 相交於兩端點，故選 <strong>C</strong>。
+              </p>
+            </div>
+
+            <!-- Right: Q22 Proof -->
+            <div class="col-span-6 card-panel flex flex-col justify-between space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">第 22 題：Solve1 中 cnt 最大值</span>
+                <span class="ans-pill">答案：B</span>
+              </div>
+
+              <div class="text-xs text-slate-700 space-y-1.5">
+                <div class="font-mono bg-slate-50 p-2 rounded border border-slate-200 text-[11px]">
+                  cnt(m) = −m² + (n + 1)m<br/>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= −(m − (n + 1)/2)² + (n + 1)² / 4
+                </div>
+
+                <div>
+                  <strong>情況一（$n$ 為奇數）：</strong>$(n+1)/2$ 為整數，可取到頂點值 $\frac{(n+1)^2}{4} = \left\lfloor\frac{(n+1)^2}{4}\right\rfloor$。
+                </div>
+                <div>
+                  <strong>情況二（$n$ 為偶數）：</strong>最接近頂點的整數為 $m = \frac{n}{2}$ 或 $\frac{n+2}{2}$，代入得：
+                  <span class="font-mono text-[11px]">n(n+2)/4 = ((n+1)² − 1)/4 = ⌊(n+1)² / 4⌋</span>。
+                </div>
+              </div>
+
+              <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 font-bold">
+                統一公式：MAX = ⌊(n + 1)² / 4⌋，故選 B。
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第二部分：閱讀程序 (2) (第 21–22 題)</span>
+            <span>第 11 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 12: Fill-in-the-blank (1) Q23 - Q25
+      {
+        id: 12,
+        section: "三、完善程序 (1) (23–25)",
+        title: "第 23–25 題：大炒切葱 — 上界、向上取整與段數公式",
+        subtitle: "二分答案求最大可切長度 L，避免整數二分陷入死迴圈",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">三、完善程序 (1) · 大炒切葱（第 23 至 25 題）</span>
+              <h2 class="text-lg font-extrabold text-slate-900">二分搜索區間上界、向上取整 mid 與單段切分</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 12 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Code snippet -->
+            <div class="col-span-6 space-y-2">
+              <pre class="cpp-box"><span class="kw">int</span> l = <span class="num">1</span>, r = <span class="blank-tag">①</span>, mid, cnt;
+<span class="kw">while</span> (l &lt; r) {
+  mid = <span class="blank-tag">②</span>, cnt = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= n; i++) cnt += <span class="blank-tag">③</span>;
+  <span class="blank-tag">④</span>
+  <span class="kw">else</span> r = <span class="blank-tag">⑤</span>;
+}
+cout &lt;&lt; l;</pre>
+
+              <div class="card-subtle text-xs text-slate-700 space-y-1">
+                <div><strong>單調性：</strong>長度 $L$ 越大，每段葱切出的段數 $\lfloor a[i]/L \rfloor$ 越少；滿足「總段數 $\ge k$」的 $L$ 具有單調性，可用二分答案求最大值。</div>
+              </div>
+            </div>
+
+            <!-- Right: Q23 - Q25 -->
+            <div class="col-span-6 space-y-2">
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 23 題：`①` 處填上界</span>
+                  <span class="ans-pill">答案：D (`100`)</span>
+                </div>
+                <p class="text-xs text-slate-600">題目說明每段葱長度不超過 <code class="font-mono">100</code>，故最大可能長度上界為 <code class="font-mono">100</code>，選 <strong>D</strong>。</p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 24 題：`②` 處填 `mid`</span>
+                  <span class="ans-pill">答案：C (`(l + r + 1) &gt;&gt; 1`)</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  求最大可行值且合法時令 <code class="font-mono">l = mid</code>，必須使用<strong>向上取整</strong> <code class="font-mono">(l + r + 1) &gt;&gt; 1</code>；若向下取整，當 <code class="font-mono">l = r - 1</code> 且合法時 <code class="font-mono">mid = l</code> 會導致死迴圈。選 <strong>C</strong>。
+                </p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 25 題：`③` 處累加段數</span>
+                  <span class="ans-pill">答案：A (`a[i] / mid`)</span>
+                </div>
+                <p class="text-xs text-slate-600">長度為 <code class="font-mono">a[i]</code> 的葱切成每段 <code class="font-mono">mid</code>，可得 <code class="font-mono">a[i] / mid</code> 段（整數除法即向下取整），選 <strong>A</strong>。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第三部分：完善程序 (1) 大炒切葱 (第 23–25 題)</span>
+            <span>第 12 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 13: Fill-in-the-blank (1) Q26 - Q27 & Sample Trace
+      {
+        id: 13,
+        section: "三、完善程序 (1) (26–27)",
+        title: "第 26–27 題：大炒切葱 — 轉移條件與範例模擬",
+        subtitle: "cnt >= k 時保留右半區間 l = mid；否則縮小右界 r = mid - 1",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">三、完善程序 (1) · 大炒切葱（第 26 至 27 題）</span>
+              <h2 class="text-lg font-extrabold text-slate-900">二分條件更新與範例 n=4, k=6 完整追蹤</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 13 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Q26 & Q27 -->
+            <div class="col-span-6 space-y-2.5">
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 26 題：`④` 處合法條件</span>
+                  <span class="ans-pill">答案：A (`if (cnt &gt;= k) l = mid;`)</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  題目要求切出<strong>至少</strong> <code class="font-mono">k</code> 段（即 <code class="font-mono">cnt &gt;= k</code>）。若可行，代表 <code class="font-mono">mid</code> 是候選答案且可能更大，故令 <code class="font-mono">l = mid</code>，選 <strong>A</strong>。
+                </p>
+              </div>
+
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 27 題：`⑤` 處不可行更新</span>
+                  <span class="ans-pill">答案：A (`mid - 1`)</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  當總段數 <code class="font-mono">cnt &lt; k</code> 時，表示切得太長導致段數不足，<code class="font-mono">mid</code> 及更大長度均不可行，故令 <code class="font-mono">r = mid - 1</code>，選 <strong>A</strong>。
+                </p>
+              </div>
+            </div>
+
+            <!-- Right: Sample walkthrough -->
+            <div class="col-span-6 card-panel space-y-2">
+              <div class="text-xs font-bold text-slate-800">範例模擬：n = 4, k = 6, a = [3, 5, 7, 9]</div>
+              <div class="space-y-1.5 font-mono text-[11px] text-slate-700">
+                <div class="p-2 rounded bg-slate-50 border border-slate-200">
+                  L = 2：⌊3/2⌋ + ⌊5/2⌋ + ⌊7/2⌋ + ⌊9/2⌋ = 1 + 2 + 3 + 4 = <strong>10 ≥ 6</strong>（可行）
+                </div>
+                <div class="p-2 rounded bg-emerald-50 border border-emerald-200">
+                  L = 3：⌊3/3⌋ + ⌊5/3⌋ + ⌊7/3⌋ + ⌊9/3⌋ = 1 + 1 + 2 + 3 = <strong>7 ≥ 6</strong>（可行）
+                </div>
+                <div class="p-2 rounded bg-red-50 border border-red-200">
+                  L = 4：⌊3/4⌋ + ⌊5/4⌋ + ⌊7/4⌋ + ⌊9/4⌋ = 0 + 1 + 1 + 2 = <strong>4 &lt; 6</strong>（不足）
+                </div>
+              </div>
+              <div class="text-xs text-slate-700">
+                因此最大可行長度為 <strong class="text-emerald-700">3</strong>；當 <code class="font-mono">l == r</code> 時迴圈結束並輸出 <code class="font-mono">l</code>。
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第三部分：完善程序 (1) 大炒切葱 (第 26–27 題)</span>
+            <span>第 13 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 14: Fill-in-the-blank (2) Q28 - Q30
+      {
+        id: 14,
+        section: "三、完善程序 (2) (28–30)",
+        title: "第 28–30 題：死亡分解 — 試除質因數與剩餘因子",
+        subtitle: "對每個 x = 1..n 分解質因數並累計至 cnt 陣列",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">三、完善程序 (2) · 死亡分解（第 28 至 30 題）</span>
+              <h2 class="text-lg font-extrabold text-slate-900">質因數試除迴圈條件與尾數處理</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 14 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Code -->
+            <div class="col-span-6 space-y-2">
+              <pre class="cpp-box"><span class="kw">for</span> (<span class="kw">int</span> x = <span class="num">1</span>; x &lt;= n; x++) {
+  tmp = x;
+  <span class="blank-tag">①</span> {
+    <span class="blank-tag">②</span>
+  }
+  <span class="blank-tag">③</span>;
+}</pre>
+              <div class="card-subtle text-xs text-slate-700">
+                <strong>核心策略：</strong>$n!$ 數值極大，不能直接算乘積再分解；改為逐一分解 $x = 1, 2, \dots, n$，將所有質因數次方累加到 <code class="font-mono">cnt</code>。
+              </div>
+            </div>
+
+            <!-- Right: Q28 - Q30 -->
+            <div class="col-span-6 space-y-2">
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 28 題：`①` 處枚舉因數範圍</span>
+                  <span class="ans-pill">答案：D (`for (int i = 2; i * i &lt;= n; i++)`)</span>
+                </div>
+                <p class="text-xs text-slate-600">試除從 <code class="font-mono">2</code> 開始，上界條件 <code class="font-mono">i * i &lt;= n</code> 可涵蓋所有小於等於 $\sqrt{n}$ 的潛在質因數，選 <strong>D</strong>。</p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 29 題：`②` 處除盡相同質因子</span>
+                  <span class="ans-pill">答案：C (`while (tmp % i == 0) cnt[i]++, tmp /= i;`)</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  同一質因數可能出現多次，需用 <code class="font-mono">while</code> 持續整除並更新 <code class="font-mono">tmp</code>（不可修改 <code class="font-mono">x</code>，以免影響外層迴圈），選 <strong>C</strong>。
+                </p>
+              </div>
+
+              <div class="card-panel space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 30 題：`③` 處記錄剩餘質因數</span>
+                  <span class="ans-pill">答案：B (`cnt[tmp]++`)</span>
+                </div>
+                <p class="text-xs text-slate-600">
+                  試除完畢後，若 <code class="font-mono">tmp &gt; 1</code>，剩下的 <code class="font-mono">tmp</code> 必為大於 $\sqrt{n}$ 的質因數；若為 <code class="font-mono">1</code> 則 <code class="font-mono">cnt[1]</code> 最後不會被輸出，故 <code class="font-mono">cnt[tmp]++</code> 安全正確，選 <strong>B</strong>。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第三部分：完善程序 (2) 死亡分解 (第 28–30 題)</span>
+            <span>第 14 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 15: Fill-in-the-blank (2) Q31 - Q32 & 5! Trace
+      {
+        id: 15,
+        section: "三、完善程序 (2) (31–32)",
+        title: "第 31–32 題：死亡分解 — 由小到大輸出質因數",
+        subtitle: "依序輸出 cnt[i] 個質因數 i，以 5! = 120 驗證流程",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-blue-600">三、完善程序 (2) · 死亡分解（第 31 至 32 題）</span>
+              <h2 class="text-lg font-extrabold text-slate-900">輸出質因數分解結果與 5! 追蹤範例</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 15 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: Q31 & Q32 -->
+            <div class="col-span-6 space-y-2.5">
+              <pre class="cpp-box"><span class="kw">for</span> (<span class="kw">int</span> i = <span class="blank-tag">④</span>; i &lt;= n; i++) <span class="blank-tag">⑤</span></pre>
+
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 31 題：`④` 處起始值</span>
+                  <span class="ans-pill">答案：B (`2`)</span>
+                </div>
+                <p class="text-xs text-slate-600"><code class="font-mono">1</code> 不是質數，最小質因數為 <code class="font-mono">2</code>，故從 <code class="font-mono">2</code> 開始列舉，選 <strong>B</strong>。</p>
+              </div>
+
+              <div class="card-panel space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">第 32 題：`⑤` 處輸出語句</span>
+                  <span class="ans-pill">答案：D (`while (cnt[i]--) cout &lt;&lt; i &lt;&lt; ' ';`)</span>
+                </div>
+                <p class="text-xs text-slate-600">需輸出 <code class="font-mono">cnt[i]</code> 個<strong>質因數 <code class="font-mono">i</code></strong>（而非 <code class="font-mono">cnt[i]</code> 或 <code class="font-mono">j</code>），故選 <strong>D</strong>。</p>
+              </div>
+            </div>
+
+            <!-- Right: Trace n = 5 -->
+            <div class="col-span-6 card-panel space-y-2">
+              <div class="text-xs font-bold text-slate-800">範例追蹤：輸入 n = 5（5! = 120）</div>
+              <div class="font-mono text-[11px] text-slate-700 space-y-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                <div>x = 1 → 1</div>
+                <div>x = 2 → 2 (cnt[2]=1)</div>
+                <div>x = 3 → 3 (cnt[3]=1)</div>
+                <div>x = 4 → 2 × 2 (cnt[2]=3)</div>
+                <div>x = 5 → 5 (cnt[5]=1)</div>
+              </div>
+              <div class="text-xs text-slate-700 space-y-1">
+                <div>因式分解結果：$5! = 2^3 \times 3^1 \times 5^1 = 120$。</div>
+                <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-200 font-mono text-xs text-emerald-900 font-bold">
+                  輸出序列：2 2 2 3 5
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>第三部分：完善程序 (2) 死亡分解 (第 31–32 題)</span>
+            <span>第 15 / 16 頁</span>
+          </div>
+        `
+      },
+
+      // SLIDE 16: Final Summary (No average score mentioned)
+      {
+        id: 16,
+        section: "考點總結",
+        title: "考點總結與 C++ 實戰避坑清單",
+        subtitle: "六大核心模組歸納與考場常見失分點回顧",
+        render: () => `
+          <div class="slide-header">
+            <div>
+              <span class="text-xs font-bold text-indigo-600">考點總結 · COMPREHENSIVE SUMMARY</span>
+              <h2 class="text-lg font-extrabold text-slate-900">S5AB C++ 核心考點統整與複習建議</h2>
+            </div>
+            <span class="text-xs font-mono text-slate-500">SLIDE 16 / 16</span>
+          </div>
+
+          <div class="slide-body grid-cols-12">
+            <!-- Left: 6 Core Modules -->
+            <div class="col-span-7 grid grid-cols-2 gap-2">
+              <div class="card-subtle space-y-1">
+                <div class="text-xs font-bold text-blue-700">1. 枚舉與複雜度分析</div>
+                <p class="text-[11.5px] text-slate-600 leading-snug">
+                  掌握多重迴圈計數與代數降階（如三元組由 $\Theta(n^3)$ 優化至 $\Theta(n^2)$），善用剪枝與函數極值分析。
+                </p>
+              </div>
+
+              <div class="card-subtle space-y-1">
+                <div class="text-xs font-bold text-indigo-700">2. 位元運算與邏輯優先級</div>
+                <p class="text-[11.5px] text-slate-600 leading-snug">
+                  熟練 <code class="font-mono">~</code>、<code class="font-mono">&amp;</code>、<code class="font-mono">^</code>、<code class="font-mono">&lt;&lt;</code>、<code class="font-mono">&gt;&gt;</code> 與 <code class="font-mono">&amp;&amp;</code>、<code class="font-mono">!</code> 差異，善用 <code class="font-mono">2^k - 1</code> 遮罩性質。
+                </p>
+              </div>
+
+              <div class="card-subtle space-y-1">
+                <div class="text-xs font-bold text-emerald-700">3. 前綴和與滑動窗口</div>
+                <p class="text-[11.5px] text-slate-600 leading-snug">
+                  區間累加可預處理前綴和；固定長度 <code class="font-mono">m</code> 窗口透過「進右出左」將單窗查詢壓縮至 $\Theta(1)$。
+                </p>
+              </div>
+
+              <div class="card-subtle space-y-1">
+                <div class="text-xs font-bold text-amber-700">4. 二分答案與邊界控制</div>
+                <p class="text-[11.5px] text-slate-600 leading-snug">
+                  先驗證單調性與上下界；求最大值且 <code class="font-mono">l = mid</code> 時用向上取整 <code class="font-mono">(l + r + 1) &gt;&gt; 1</code>，未命中時 <code class="font-mono">l &gt; r</code>。
+                </p>
+              </div>
+
+              <div class="card-subtle space-y-1">
+                <div class="text-xs font-bold text-purple-700">5. 素數與質因數分解</div>
+                <p class="text-[11.5px] text-slate-600 leading-snug">
+                  理解質數定義與試除上限；分解階乘 <code class="font-mono">n!</code> 時逐數分解並合併質因數次方，避免直接算大數乘積。
+                </p>
+              </div>
+
+              <div class="card-subtle space-y-1">
+                <div class="text-xs font-bold text-cyan-700">6. 語法規範與競賽賽制</div>
+                <p class="text-[11.5px] text-slate-600 leading-snug">
+                  熟悉 OI 賽制特點、合法標識符規則、ASCII 區間判斷與 <code class="font-mono">vector</code> 下標 <code class="font-mono">0 .. size()-1</code> 邊界。
+                </p>
+              </div>
+            </div>
+
+            <!-- Right: Pitfall Checklist -->
+            <div class="col-span-5 card-panel flex flex-col justify-between space-y-2">
+              <div class="space-y-2">
+                <div class="text-xs font-bold text-slate-900">考場高頻陷阱檢核表</div>
+                <ul class="text-xs text-slate-700 space-y-1.5 list-disc pl-4">
+                  <li><strong>最值初始值：</strong>答案可能為負數時，切勿將 <code class="font-mono">ans</code> 寫死為 <code class="font-mono">0</code>（見第 17 題）。</li>
+                  <li><strong>迴圈變數污染：</strong>內層試除或更新變數時，注意是否誤改外層迴圈控制變數（見第 29 題）。</li>
+                  <li><strong>整數除法截斷：</strong>正整數除法 <code class="font-mono">a / b</code> 向下取整，注意與向上取整公式區分。</li>
+                  <li><strong>關鍵字與大小寫：</strong>區分保留字與大小寫敏感的標識符名稱。</li>
+                </ul>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-900 font-semibold">
+                祝同學在後續 C++ 練習與競賽中穩紮穩打、步步為營！
+              </div>
+            </div>
+          </div>
+
+          <div class="slide-footer">
+            <span>考點總結與實戰避坑指南</span>
+            <span>第 16 / 16 頁 · 全卷完</span>
+          </div>
+        `
+      }
+    ];
+
+    let currentSlideIndex = 0;
+
+    /**
+     * Render KaTeX inside a target DOM element safely.
+     */
+    function renderMathInElement(el) {
+      if (!el || typeof window.renderMathInElement !== 'function') return;
+      try {
+        window.renderMathInElement(el, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      } catch (err) {
+        console.error('KaTeX rendering error:', err);
+      }
+    }
+
+    /**
+     * Update active slide stage, counter, progress bar, and pill strip.
+     */
+    function renderActiveSlide() {
+      const stage = document.getElementById('active-slide-stage');
+      const slide = SLIDES[currentSlideIndex];
+      if (!stage || !slide) return;
+
+      stage.innerHTML = slide.render();
+      renderMathInElement(stage);
+
+      const counter = document.getElementById('slide-counter');
+      if (counter) {
+        counter.textContent = `${currentSlideIndex + 1} / ${SLIDES.length}`;
+      }
+
+      const progressBar = document.getElementById('progress-bar');
+      if (progressBar) {
+        const pct = ((currentSlideIndex + 1) / SLIDES.length) * 100;
+        progressBar.style.width = `${pct}%`;
+      }
+
+      updatePillStrip();
+      updateNavigatorActiveState();
+    }
+
+    /**
+     * Build and refresh bottom quick-jump pills.
+     */
+    function updatePillStrip() {
+      const strip = document.getElementById('bottom-pill-strip');
+      if (!strip) return;
+
+      strip.innerHTML = SLIDES.map((s, idx) => {
+        const active = idx === currentSlideIndex;
+        return `
+          <button
+            onclick="goToSlide(${idx})"
+            title="${s.title}"
+            class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold transition cursor-pointer shrink-0 ${
+              active
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+            }"
+          >
+            ${String(idx + 1).padStart(2, '0')}
+          </button>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Build slide navigator list.
+     */
+    function buildNavigatorList() {
+      const list = document.getElementById('nav-list');
+      if (!list) return;
+
+      list.innerHTML = SLIDES.map((s, idx) => `
+        <button
+          id="nav-item-${idx}"
+          onclick="goToSlide(${idx}); toggleNavigator();"
+          class="w-full text-left px-3 py-2 rounded-lg border transition flex items-start gap-2.5 cursor-pointer"
+        >
+          <span class="font-mono text-xs font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 mt-0.5">
+            ${String(idx + 1).padStart(2, '0')}
+          </span>
+          <div class="min-w-0">
+            <div class="text-[11px] font-semibold text-blue-600">${s.section}</div>
+            <div class="text-xs font-bold text-slate-800 truncate">${s.title}</div>
+          </div>
+        </button>
+      `).join('');
+
+      updateNavigatorActiveState();
+    }
+
+    function updateNavigatorActiveState() {
+      SLIDES.forEach((_, idx) => {
+        const item = document.getElementById(`nav-item-${idx}`);
+        if (!item) return;
+        if (idx === currentSlideIndex) {
+          item.className = 'w-full text-left px-3 py-2 rounded-lg border border-blue-500 bg-blue-50/70 transition flex items-start gap-2.5 cursor-pointer';
+        } else {
+          item.className = 'w-full text-left px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition flex items-start gap-2.5 cursor-pointer';
+        }
+      });
+    }
+
+    function toggleNavigator() {
+      const drawer = document.getElementById('nav-drawer');
+      if (!drawer) return;
+      drawer.classList.toggle('hidden');
+    }
+
+    function closeNavigatorOnBackdrop(event) {
+      if (event.target && event.target.id === 'nav-drawer') {
+        toggleNavigator();
+      }
+    }
+
+    function goToSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= SLIDES.length) index = SLIDES.length - 1;
+      currentSlideIndex = index;
+      renderActiveSlide();
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < SLIDES.length - 1) {
+        currentSlideIndex++;
+        renderActiveSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlideIndex > 0) {
+        currentSlideIndex--;
+        renderActiveSlide();
+      }
+    }
+
+    /**
+     * Prepare all 16:9 slides for print / PDF export.
+     */
+    function buildPrintDeck() {
+      const printContainer = document.getElementById('all-slides-print');
+      if (!printContainer) return;
+
+      printContainer.innerHTML = SLIDES.map((s) => `
+        <div class="print-slide-page">
+          <div class="slide-16-9">
+            ${s.render()}
+          </div>
+        </div>
+      `).join('');
+
+      renderMathInElement(printContainer);
+    }
+
+    // Keyboard navigation support
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        const drawer = document.getElementById('nav-drawer');
+        if (drawer && !drawer.classList.contains('hidden')) return;
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        const drawer = document.getElementById('nav-drawer');
+        if (drawer && !drawer.classList.contains('hidden')) return;
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Escape') {
+        const drawer = document.getElementById('nav-drawer');
+        if (drawer && !drawer.classList.contains('hidden')) {
+          toggleNavigator();
+        }
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      buildNavigatorList();
+      renderActiveSlide();
+
+      // Re-render KaTeX once scripts finish loading if needed
+      const checkKatex = setInterval(() => {
+        if (typeof window.renderMathInElement === 'function') {
+          clearInterval(checkKatex);
+          renderActiveSlide();
+          buildPrintDeck();
+        }
+      }, 100);
+      setTimeout(() => clearInterval(checkKatex), 4000);
+    });
+  </script>
+</body>
+</html>
